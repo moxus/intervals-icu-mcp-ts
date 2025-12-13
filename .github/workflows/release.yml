@@ -25,7 +25,7 @@ jobs:
           registry-url: 'https://registry.npmjs.org'
 
       - name: Install dependencies
-        run: pnpm install
+        run: npm install
 
       - name: Configure Git User
         run: |
@@ -34,7 +34,7 @@ jobs:
 
       - name: Bump Version
         run: |
-          npm version patch -m "chore(release): %s [skip ci]"
+          npm version patch -m "chore(release): %s [skip ci]" || git status
 
       - name: Build
         run: npm run build
