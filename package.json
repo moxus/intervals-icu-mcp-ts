@@ -2,6 +2,10 @@
   "name": "@moxus/intervals-mcp",
   "version": "1.0.1",
   "description": "MCP Server for Intervals.icu",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/moxus/intervals-icu-mcp-ts"
+  },
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
