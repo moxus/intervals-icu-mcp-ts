@@ -11,7 +11,7 @@ const program = new Command();
 program
   .name('intervals-mcp')
   .description('MCP Server for Intervals.icu API')
-  .version('1.0.0');
+  .version(process.env.VERSION || '0.0.0');
 
 // Helper to check env vars
 function getEnvConfig() {

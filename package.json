@@ -1,11 +1,17 @@
 {
-  "name": "intervals-mcp",
+  "name": "@moxus/intervals-mcp",
   "version": "1.0.0",
   "description": "MCP Server for Intervals.icu",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
     "intervals-mcp": "./dist/index.js"
+  },
+  "files": [
+    "dist"
+  ],
+  "publishConfig": {
+    "access": "public"
   },
   "scripts": {
     "build": "tsup",
