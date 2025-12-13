@@ -8,10 +8,10 @@ You need an API Key and your Athlete ID from Intervals.icu.
 
 ### Environment Variables
 
-| Variable | Description |
-| :--- | :--- |
+| Variable               | Description                                    |
+| :--------------------- | :--------------------------------------------- |
 | `INTERVALS_ATHLETE_ID` | Your Intervals.icu Athlete ID (e.g., `i12345`) |
-| `INTERVALS_API_KEY` | Your Intervals.icu API Key |
+| `INTERVALS_API_KEY`    | Your Intervals.icu API Key                     |
 
 ### Setting Environment Variables
 

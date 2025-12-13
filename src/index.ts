@@ -19,7 +19,9 @@ function getEnvConfig() {
   const apiKey = process.env.INTERVALS_API_KEY;
 
   if (!athleteId || !apiKey) {
-    console.error('Error: INTERVALS_ATHLETE_ID and INTERVALS_API_KEY must be set in environment variables (or .env file).');
+    console.error(
+      'Error: INTERVALS_ATHLETE_ID and INTERVALS_API_KEY must be set in environment variables (or .env file).',
+    );
     process.exit(1);
   }
   return { athleteId, apiKey };
@@ -46,16 +48,15 @@ program
   });
 
 // Default action: Start MCP Server
-program
-  .action(async () => {
-    const { athleteId, apiKey } = getEnvConfig();
-    try {
-      // Note: MCP SDK usually logs to stderr so it doesn't interfere with stdio transport
-      await startServer(athleteId, apiKey);
-    } catch (error) {
-      console.error("Failed to start MCP server:", error);
-      process.exit(1);
-    }
-  });
+program.action(async () => {
+  const { athleteId, apiKey } = getEnvConfig();
+  try {
+    // Note: MCP SDK usually logs to stderr so it doesn't interfere with stdio transport
+    await startServer(athleteId, apiKey);
+  } catch (error) {
+    console.error('Failed to start MCP server:', error);
+    process.exit(1);
+  }
+});
 
 program.parse(process.argv);

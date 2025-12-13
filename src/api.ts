@@ -7,7 +7,7 @@ import {
   WorkoutSchema,
   CreateEventSchema,
   UpdateEventSchema,
-  CreateWorkoutSchema
+  CreateWorkoutSchema,
 } from './schemas.js';
 import { z } from 'zod';
 
@@ -33,7 +33,8 @@ export class IntervalsClient {
     if (axios.isAxiosError(error)) {
       const status = error.response?.status;
       const data = error.response?.data;
-      const message = data && typeof data === 'object' && 'error' in data ? (data as any).error : error.message;
+      const message =
+        data && typeof data === 'object' && 'error' in data ? (data as any).error : error.message;
       throw new Error(`Intervals.icu API Error [${context}]: ${status} - ${message}`);
     }
     throw error;
@@ -66,17 +67,18 @@ export class IntervalsClient {
 
   async getActivity(activityId: string) {
     try {
-        const response = await this.axios.get(`/activity/${activityId}`);
-        return ActivitySchema.parse(response.data);
+      const response = await this.axios.get(`/activity/${activityId}`);
+      return ActivitySchema.parse(response.data);
     } catch (error) {
-        this.handleError(error, 'getActivity');
+      this.handleError(error, 'getActivity');
     }
   }
 
   // --- Wellness ---
   async getWellness(oldest: string, newest: string) {
     try {
-      const response = await this.axios.get(`/athlete/${this.athleteId}/wellness.json`, { // .json ext might be required or supported
+      const response = await this.axios.get(`/athlete/${this.athleteId}/wellness.json`, {
+        // .json ext might be required or supported
         params: { oldest, newest },
       });
       return z.array(WellnessSchema).parse(response.data);
@@ -97,10 +99,10 @@ export class IntervalsClient {
 
   async createWorkout(workout: z.infer<typeof CreateWorkoutSchema>) {
     try {
-        const response = await this.axios.post(`/athlete/${this.athleteId}/workouts`, workout);
-        return WorkoutSchema.parse(response.data);
+      const response = await this.axios.post(`/athlete/${this.athleteId}/workouts`, workout);
+      return WorkoutSchema.parse(response.data);
     } catch (error) {
-        this.handleError(error, 'createWorkout');
+      this.handleError(error, 'createWorkout');
     }
   }
 
@@ -127,7 +129,7 @@ export class IntervalsClient {
     // Let's check if date < today (start of day).
     // Better: Check if date is before now.
     if (eventDate < now) {
-        throw new Error("Cannot create events in the past.");
+      throw new Error('Cannot create events in the past.');
     }
 
     try {
@@ -142,21 +144,21 @@ export class IntervalsClient {
     // 1. Fetch existing event to check date
     let existingEvent;
     try {
-        const events = await this.axios.get(`/athlete/${this.athleteId}/events/${id}`);
-        existingEvent = EventSchema.parse(events.data);
+      const events = await this.axios.get(`/athlete/${this.athleteId}/events/${id}`);
+      existingEvent = EventSchema.parse(events.data);
     } catch (e) {
-        this.handleError(e, `fetchEventForUpdate-${id}`);
+      this.handleError(e, `fetchEventForUpdate-${id}`);
     }
 
     if (!existingEvent) {
-         throw new Error("Event not found");
+      throw new Error('Event not found');
     }
 
     const eventDate = new Date(existingEvent.start_date_local);
     const now = new Date();
 
     if (eventDate < now) {
-        throw new Error("Cannot modify past events.");
+      throw new Error('Cannot modify past events.');
     }
 
     // 2. Perform update
@@ -169,25 +171,25 @@ export class IntervalsClient {
   }
 
   async deleteEvent(id: number) {
-     // 1. Fetch existing event to check date
-     let existingEvent;
-     try {
-         const events = await this.axios.get(`/athlete/${this.athleteId}/events/${id}`);
-         existingEvent = EventSchema.parse(events.data);
-     } catch (e) {
-         this.handleError(e, `fetchEventForDelete-${id}`);
-     }
+    // 1. Fetch existing event to check date
+    let existingEvent;
+    try {
+      const events = await this.axios.get(`/athlete/${this.athleteId}/events/${id}`);
+      existingEvent = EventSchema.parse(events.data);
+    } catch (e) {
+      this.handleError(e, `fetchEventForDelete-${id}`);
+    }
 
-     if (!existingEvent) {
-          throw new Error("Event not found");
-     }
+    if (!existingEvent) {
+      throw new Error('Event not found');
+    }
 
-     const eventDate = new Date(existingEvent.start_date_local);
-     const now = new Date();
+    const eventDate = new Date(existingEvent.start_date_local);
+    const now = new Date();
 
-     if (eventDate < now) {
-         throw new Error("Cannot delete past events.");
-     }
+    if (eventDate < now) {
+      throw new Error('Cannot delete past events.');
+    }
 
     try {
       await this.axios.delete(`/athlete/${this.athleteId}/events/${id}`);
