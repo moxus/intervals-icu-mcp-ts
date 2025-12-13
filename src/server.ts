@@ -2,6 +2,7 @@ import { McpServer } from '@modelcontextprotocol/sdk/server/mcp.js';
 import { StdioServerTransport } from '@modelcontextprotocol/sdk/server/stdio.js';
 import { z } from 'zod';
 import { IntervalsClient } from './api.js';
+import { removeNulls } from './utils.js';
 import {
     DateRangeSchema,
     CreateEventSchema,
@@ -27,7 +28,7 @@ export async function startServer(athleteId: string, apiKey: string) {
         async () => {
             const profile = await client.getAthleteProfile();
             return {
-                content: [{ type: "text", text: JSON.stringify(profile, null, 2) }]
+                content: [{ type: "text", text: JSON.stringify(removeNulls(profile), null, 2) }]
             };
         }
     );
@@ -43,7 +44,7 @@ export async function startServer(athleteId: string, apiKey: string) {
         async ({ oldest, newest }) => {
             const activities = await client.getActivities(oldest, newest);
             return {
-                content: [{ type: "text", text: JSON.stringify(activities, null, 2) }]
+                content: [{ type: "text", text: JSON.stringify(removeNulls(activities), null, 2) }]
             };
         }
     );
@@ -58,7 +59,7 @@ export async function startServer(athleteId: string, apiKey: string) {
         async ({ id }) => {
             const activity = await client.getActivity(id);
             return {
-                content: [{ type: "text", text: JSON.stringify(activity, null, 2) }]
+                content: [{ type: "text", text: JSON.stringify(removeNulls(activity), null, 2) }]
             };
         }
     );
@@ -74,7 +75,7 @@ export async function startServer(athleteId: string, apiKey: string) {
         async ({ oldest, newest }) => {
             const wellness = await client.getWellness(oldest, newest);
             return {
-                content: [{ type: "text", text: JSON.stringify(wellness, null, 2) }]
+                content: [{ type: "text", text: JSON.stringify(removeNulls(wellness), null, 2) }]
             };
         }
     );
@@ -87,7 +88,7 @@ export async function startServer(athleteId: string, apiKey: string) {
         async () => {
             const workouts = await client.getWorkouts();
             return {
-                content: [{ type: "text", text: JSON.stringify(workouts, null, 2) }]
+                content: [{ type: "text", text: JSON.stringify(removeNulls(workouts), null, 2) }]
             };
         }
     );
@@ -106,7 +107,7 @@ export async function startServer(athleteId: string, apiKey: string) {
         async (args) => {
             const workout = await client.createWorkout(args);
             return {
-                content: [{ type: "text", text: JSON.stringify(workout, null, 2) }]
+                content: [{ type: "text", text: JSON.stringify(removeNulls(workout), null, 2) }]
             };
         }
     );
@@ -122,7 +123,7 @@ export async function startServer(athleteId: string, apiKey: string) {
         async ({ oldest, newest }) => {
             const events = await client.getEvents(oldest, newest);
             return {
-                content: [{ type: "text", text: JSON.stringify(events, null, 2) }]
+                content: [{ type: "text", text: JSON.stringify(removeNulls(events), null, 2) }]
             };
         }
     );
@@ -144,7 +145,7 @@ export async function startServer(athleteId: string, apiKey: string) {
         async (args) => {
             const event = await client.createEvent(args);
             return {
-                content: [{ type: "text", text: JSON.stringify(event, null, 2) }]
+                content: [{ type: "text", text: JSON.stringify(removeNulls(event), null, 2) }]
             };
         }
     );
@@ -167,7 +168,7 @@ export async function startServer(athleteId: string, apiKey: string) {
             const { id, ...updateData } = args;
             const event = await client.updateEvent(id, updateData);
             return {
-                content: [{ type: "text", text: JSON.stringify(event, null, 2) }]
+                content: [{ type: "text", text: JSON.stringify(removeNulls(event), null, 2) }]
             };
         }
     );
@@ -182,7 +183,7 @@ export async function startServer(athleteId: string, apiKey: string) {
         async ({ id }) => {
             const result = await client.deleteEvent(id);
             return {
-                content: [{ type: "text", text: JSON.stringify(result, null, 2) }]
+                content: [{ type: "text", text: JSON.stringify(removeNulls(result), null, 2) }]
             };
         }
     );
