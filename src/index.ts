@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import { startServer } from './server.js';
 import { IntervalsClient } from './api.js';
 
-dotenv.config();
+dotenv.config({ quiet: true } as any);
 
 const program = new Command();
 
@@ -15,11 +15,11 @@ program
 
 // Helper to check env vars
 function getEnvConfig() {
-  const athleteId = process.env.ATHLETE_ID;
-  const apiKey = process.env.API_KEY;
+  const athleteId = process.env.INTERVALS_ATHLETE_ID;
+  const apiKey = process.env.INTERVALS_API_KEY;
 
   if (!athleteId || !apiKey) {
-    console.error('Error: ATHLETE_ID and API_KEY must be set in environment variables (or .env file).');
+    console.error('Error: INTERVALS_ATHLETE_ID and INTERVALS_API_KEY must be set in environment variables (or .env file).');
     process.exit(1);
   }
   return { athleteId, apiKey };
