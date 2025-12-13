@@ -32,9 +32,13 @@ jobs:
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
+      - name: clean git
+        run: |
+          git checkout package-lock.json
+
       - name: Bump Version
         run: |
-          npm version patch -m "chore(release): %s [skip ci]" || git status
+          npm version patch -m "chore(release): %s [skip ci]"
 
       - name: Build
         run: npm run build
