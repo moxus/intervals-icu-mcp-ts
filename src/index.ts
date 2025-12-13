@@ -4,7 +4,7 @@ import dotenv from 'dotenv';
 import { startServer } from './server.js';
 import { IntervalsClient } from './api.js';
 
-dotenv.config({ quiet: true } as any);
+dotenv.config({ quiet: true });
 
 const program = new Command();
 
