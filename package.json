@@ -18,6 +18,7 @@
     "type": "git",
     "url": "https://github.com/moxus/intervals-icu-mcp-ts"
   },
+  "license": "MIT",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
