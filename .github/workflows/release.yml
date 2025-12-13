@@ -34,7 +34,7 @@ jobs:
 
       - name: Bump Version
         run: |
-          npm version patch -m "chore(release): %s [skip ci]"
+          npm version patch -m "chore(release): %s [skip ci]" || git status
 
       - name: Build
         run: npm run build
