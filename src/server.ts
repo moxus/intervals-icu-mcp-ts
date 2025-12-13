@@ -99,7 +99,7 @@ export async function startServer(athleteId: string, apiKey: string) {
         "Create a new workout in the library.",
         {
             name: z.string().describe("Workout Name"),
-            description: z.string().optional().describe("Workout steps/description text"),
+            description: z.string().optional().describe("Workout steps/description text. MUST follow Intervals.icu builder syntax. For repeating steps (e.g. 5x), insert an empty line before and after the block (e.g. '\\n\\n5x\\n- 3m Z5\\n- 3m Z1\\n\\n'). Use \\n for new lines."),
             folder_id: z.number().int().optional().describe("Folder ID to place the workout in"),
             type: z.string().optional().describe("Sport type (Ride, Run, etc.)"),
             indoor: z.boolean().optional(),
@@ -139,7 +139,7 @@ export async function startServer(athleteId: string, apiKey: string) {
                 'WORKOUT', 'RACE_A', 'RACE_B', 'RACE_C', 'NOTE', 'PLAN', 'HOLIDAY',
                 'SICK', 'INJURED', 'SET_EFTP', 'FITNESS_DAYS', 'SEASON_START', 'TARGET', 'SET_FITNESS'
             ]).optional(),
-            description: z.string().optional(),
+            description: z.string().optional().describe("Description/Notes. If category=WORKOUT, this MUST follow Intervals.icu builder syntax. For repeating steps (e.g. 5x), insert an empty line before and after the block (e.g. '\\n\\n5x\\n- 3m Z5\\n- 3m Z1\\n\\n'). Otherwise, it is free text."),
             type: z.string().optional(),
         },
         async (args) => {
@@ -158,7 +158,7 @@ export async function startServer(athleteId: string, apiKey: string) {
             id: z.number().int().describe("Event ID"),
             start_date_local: z.string().regex(/^\d{4}-\d{2}-\d{2}T\d{2}:\d{2}:\d{2}$/).optional(),
             name: z.string().optional(),
-            description: z.string().optional(),
+            description: z.string().optional().describe("Description/Notes. If category=WORKOUT, this MUST follow Intervals.icu builder syntax. For repeating steps (e.g. 5x), insert an empty line before and after the block (e.g. '\\n\\n5x\\n- 3m Z5\\n- 3m Z1\\n\\n'). Otherwise, it is free text."),
             category: z.enum([
                 'WORKOUT', 'RACE_A', 'RACE_B', 'RACE_C', 'NOTE', 'PLAN', 'HOLIDAY',
                 'SICK', 'INJURED', 'SET_EFTP', 'FITNESS_DAYS', 'SEASON_START', 'TARGET', 'SET_FITNESS'
