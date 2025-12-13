@@ -12,7 +12,7 @@ permissions:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: "!contains(github.event.head_commit.message, '[skip ci]')"
+    if: ${{ !contains(github.event.head_commit.message, '[skip ci]') }}
     steps:
       - uses: actions/checkout@v4
         with:
@@ -33,7 +33,8 @@ jobs:
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
       - name: Bump Version
-        run: npm version patch -m "chore(release): %s [skip ci]"
+        run: |
+          npm version patch -m "chore(release): %s [skip ci]"
 
       - name: Build
         run: npm run build
