@@ -2,6 +2,18 @@
   "name": "@moxus/intervals-mcp",
   "version": "1.0.4",
   "description": "MCP Server for Intervals.icu",
+  "keywords": [
+    "mcp",
+    "mcp-server",
+    "intervals.icu",
+    "fitness",
+    "cycling",
+    "running",
+    "ai",
+    "llm",
+    "agent",
+    "typescript"
+  ],
   "repository": {
     "type": "git",
     "url": "https://github.com/moxus/intervals-icu-mcp-ts"
