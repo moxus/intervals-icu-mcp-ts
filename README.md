@@ -73,9 +73,19 @@ npx @moxus/intervals-mcp verify
 
 If successful, you will see your athlete details. If it fails, check your API key and Athlete ID.
 
-## Adding to Gemini CLI Agent
+## Gemini Installation
 
-To add this MCP server to a CLI agent like `gemini-cli` (or similar agents that support MCP), you typically need to configure the agent to spawn this server process.
+The simplest way to install this MCP server for Gemini is using the extension:
+
+```bash
+gemini extension install https://github.com/moxus/intervals-icu-gemini
+```
+
+For more details, refer to the [Intervals.icu Gemini Extension repository](https://github.com/moxus/intervals-icu-gemini).
+
+### Manual Configuration (Alternative)
+
+To add this MCP server to a CLI agent like `gemini-cli` (or similar agents that support MCP) manually, you typically need to configure the agent to spawn this server process.
 
 Assuming `gemini-cli` supports an MCP configuration file (like `mcp_config.json` or command line arguments), you would add an entry for `@moxus/intervals-mcp`.
 
