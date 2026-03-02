@@ -36,7 +36,7 @@ export async function startServer(athleteId: string, apiKey: string) {
   // 2. List Activities (summary view for token efficiency — use get_activity for full details)
   server.tool(
     'list_activities',
-    'List activity summaries for the athlete within a date range. Returns compact data (id, date, name, type, distance, moving_time, source). Use get_activity for full details on a specific activity.',
+    'List activity summaries for a date range. Returns ONLY compact identification data (id, date, name, type, distance, moving_time, elevation, heart rate, speed, training load, fitness/fatigue, calories, source). To analyze an activity in depth, you MUST call get_activity — it returns 100+ fields including power, cadence, zones, weather, performance metrics, intervals, and more.',
     {
       oldest: z
         .string()
@@ -58,7 +58,7 @@ export async function startServer(athleteId: string, apiKey: string) {
   // 3. Get Single Activity
   server.tool(
     'get_activity',
-    'Get details of a specific activity by ID.',
+    "Get FULL details of a specific activity by ID. Returns 100+ fields far beyond what list_activities provides, including: power (avg, weighted, FTP, W', joules), cadence, pace/GAP, zone times (HR/power/pace), performance metrics (efficiency factor, variability index, decoupling, polarization index), weather conditions, temperature, RPE/feel, intervals summary, achievements, gear, and tags. Always use this when answering questions about a specific activity.",
     {
       id: z.string().describe('The Activity ID'),
     },
@@ -127,7 +127,7 @@ export async function startServer(athleteId: string, apiKey: string) {
   // 7. List Events (Calendar)
   server.tool(
     'list_events',
-    'List calendar events (planned workouts, notes, etc.) within a date range.',
+    'List calendar events (planned workouts, notes, races, etc.) within a date range. Returns event details including workout descriptions/steps.',
     {
       oldest: z
         .string()

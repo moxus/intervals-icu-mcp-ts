@@ -176,7 +176,7 @@ export const ActivitySchema = z.object({
   attachments: z.array(z.unknown()).nullable().optional(),
 });
 
-// Summary schema for list_activities (token-efficient: 18 fields vs 173 from API)
+// Summary schema for list_activities (token-efficient: 18 key fields vs 111 in detail view)
 export const ActivitySummarySchema = z.object({
   id: z.string(),
   start_date_local: z.string(),
