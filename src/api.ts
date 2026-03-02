@@ -1,6 +1,7 @@
 import axios, { AxiosInstance, AxiosError } from 'axios';
 import {
   ActivitySchema,
+  ActivitySummarySchema,
   AthleteProfileSchema,
   EventSchema,
   WellnessSchema,
@@ -62,6 +63,17 @@ export class IntervalsClient {
       return z.array(ActivitySchema).parse(response.data);
     } catch (error) {
       this.handleError(error, 'getActivities');
+    }
+  }
+
+  async getActivitiesSummary(oldest: string, newest: string) {
+    try {
+      const response = await this.axios.get(`/athlete/${this.athleteId}/activities`, {
+        params: { oldest, newest },
+      });
+      return z.array(ActivitySummarySchema).parse(response.data);
+    } catch (error) {
+      this.handleError(error, 'getActivitiesSummary');
     }
   }
 

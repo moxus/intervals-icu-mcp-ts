@@ -1,7 +1,7 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { IntervalsClient } from '../src/api.js';
 import axios from 'axios';
-import { ActivitySchema, EventSchema } from '../src/schemas.js';
+import { ActivitySchema, ActivitySummarySchema, EventSchema } from '../src/schemas.js';
 
 // Mock axios
 vi.mock('axios');
@@ -126,6 +126,110 @@ describe('IntervalsClient', () => {
 
       // The client.getActivity calls ActivitySchema.parse, which should throw ZodError
       await expect(client.getActivity('act2')).rejects.toThrow();
+    });
+
+    it('should pass through extra fields on full ActivitySchema', () => {
+      const dataWithExtras = {
+        id: 'act1',
+        start_date_local: '2023-01-01T10:00:00',
+        type: 'Ride',
+        moving_time: 3600,
+        icu_training_load: 99,
+      };
+      const parsed = ActivitySchema.parse(dataWithExtras);
+      expect(parsed).toHaveProperty('icu_training_load', 99);
+      expect(parsed.id).toBe('act1');
+    });
+
+    it('should return only summary fields from ActivitySummarySchema', () => {
+      const fullActivity = {
+        id: 'act1',
+        start_date_local: '2023-01-01T10:00:00',
+        name: 'Morning Ride',
+        type: 'Ride',
+        distance: 50000,
+        moving_time: 3600,
+        elapsed_time: 4000,
+        total_elevation_gain: 500,
+        average_heartrate: 145,
+        max_heartrate: 175,
+        average_speed: 7.5,
+        icu_training_load: 88,
+        icu_atl: 55.2,
+        icu_ctl: 42.1,
+        calories: 900,
+        commute: false,
+        paired_event_id: 123,
+        source: 'STRAVA',
+        // These should be stripped:
+        average_watts: 200,
+        description: 'Long ride',
+        icu_zone_times: [],
+        skyline_chart_bytes: 'abc',
+      };
+      const parsed = ActivitySummarySchema.parse(fullActivity);
+      expect(parsed).toEqual({
+        id: 'act1',
+        start_date_local: '2023-01-01T10:00:00',
+        name: 'Morning Ride',
+        type: 'Ride',
+        distance: 50000,
+        moving_time: 3600,
+        elapsed_time: 4000,
+        total_elevation_gain: 500,
+        average_heartrate: 145,
+        max_heartrate: 175,
+        average_speed: 7.5,
+        icu_training_load: 88,
+        icu_atl: 55.2,
+        icu_ctl: 42.1,
+        calories: 900,
+        commute: false,
+        paired_event_id: 123,
+        source: 'STRAVA',
+      });
+      expect(parsed).not.toHaveProperty('average_watts');
+      expect(parsed).not.toHaveProperty('description');
+      expect(parsed).not.toHaveProperty('skyline_chart_bytes');
+    });
+
+    it('should return summaries from getActivitiesSummary', async () => {
+      const activitiesWithExtras = [
+        {
+          id: 'act1',
+          start_date_local: '2023-01-01T10:00:00',
+          name: 'Morning Ride',
+          type: 'Ride',
+          distance: 50000,
+          moving_time: 3600,
+          elapsed_time: 4000,
+          total_elevation_gain: 500,
+          average_heartrate: 145,
+          max_heartrate: 175,
+          average_speed: 7.5,
+          icu_training_load: 88,
+          icu_atl: 55.2,
+          icu_ctl: 42.1,
+          calories: 900,
+          commute: false,
+          paired_event_id: null,
+          source: 'STRAVA',
+          // Extra fields that should be stripped:
+          average_watts: 200,
+          skyline_chart_bytes: 'abc',
+          icu_zone_times: [],
+        },
+      ];
+      mockedAxios.get.mockResolvedValue({ data: activitiesWithExtras });
+
+      const result = await client.getActivitiesSummary('2023-01-01', '2023-01-31');
+      expect(result).toHaveLength(1);
+      expect(result![0]).not.toHaveProperty('average_watts');
+      expect(result![0]).not.toHaveProperty('skyline_chart_bytes');
+      expect(result![0]).not.toHaveProperty('icu_zone_times');
+      expect(result![0].id).toBe('act1');
+      expect(result![0].icu_training_load).toBe(88);
+      expect(result![0].source).toBe('STRAVA');
     });
   });
 });

@@ -33,10 +33,10 @@ export async function startServer(athleteId: string, apiKey: string) {
     },
   );
 
-  // 2. List Activities
+  // 2. List Activities (summary view for token efficiency — use get_activity for full details)
   server.tool(
     'list_activities',
-    'List activities for the athlete within a date range.',
+    'List activity summaries for the athlete within a date range. Returns compact data (id, date, name, type, distance, moving_time, source). Use get_activity for full details on a specific activity.',
     {
       oldest: z
         .string()
@@ -48,7 +48,7 @@ export async function startServer(athleteId: string, apiKey: string) {
         .describe('End date (YYYY-MM-DD)'),
     },
     async ({ oldest, newest }) => {
-      const activities = await client.getActivities(oldest, newest);
+      const activities = await client.getActivitiesSummary(oldest, newest);
       return {
         content: [{ type: 'text', text: JSON.stringify(removeNulls(activities), null, 2) }],
       };

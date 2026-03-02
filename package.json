@@ -34,6 +34,7 @@
   "scripts": {
     "build": "tsup",
     "format": "prettier --write .",
+    "inspector": "npx @modelcontextprotocol/inspector node dist/index.js",
     "start": "node dist/index.js",
     "test": "vitest run"
   },

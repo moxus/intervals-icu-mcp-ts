@@ -20,39 +20,183 @@ export const AthleteProfileSchema = z.object({
   profile_medium: nullableString,
 });
 
-// --- Activity ---
-export const ActivitySchema = z
-  .object({
-    id: z.string(),
-    start_date_local: z.string(), // ISO-8601
-    name: nullableString,
-    // The 'type' field is actually not guaranteed or might be null/undefined in some cases?
-    // Wait, the API docs say 'type' is a string enum, but looking at the errors:
-    // "path": [4, "type"], "received": "undefined", "message": "Required"
-    // It seems some activities in the array DO NOT have a 'type'.
-    // Looking at the dump, there are objects like:
-    // { "id": "10526317718", "icu_athlete_id": "i13287", "start_date_local": "...", "source": "STRAVA", "_note": "..." }
-    // These are "Hidden" or stub activities where 'type' is missing.
-    // We need to handle this union type (Activity | Hidden) or just make type optional.
-    type: nullableString,
-    distance: nullableNumber, // meters
-    moving_time: nullableInt, // seconds
-    elapsed_time: nullableInt,
-    total_elevation_gain: nullableNumber,
-    average_heartrate: nullableInt,
-    max_heartrate: nullableInt,
-    average_speed: nullableNumber, // m/s
-    average_watts: nullableInt,
-    weighted_average_watts: nullableInt,
-    normalized_power: nullableInt,
-    kilojoules: nullableNumber,
-    device_name: nullableString,
-    description: nullableString,
-    source: nullableString,
-    trainer: nullableBoolean,
-    commute: nullableBoolean,
-  })
-  .passthrough(); // Allow extra fields to avoid strict issues if I missed some
+// --- Activity (detail view: 111 curated fields, drops 63 internal/noise fields) ---
+const nullableNumberArray = z.array(z.number()).nullable().optional();
+
+export const ActivitySchema = z.object({
+  // Core identity
+  id: z.string(),
+  start_date_local: z.string(),
+  start_date: nullableString,
+  name: nullableString,
+  type: nullableString, // nullable: some stub/hidden activities lack type
+  sub_type: nullableString,
+  description: nullableString,
+  source: nullableString,
+  external_id: nullableString,
+  strava_id: nullableString,
+
+  // Time
+  moving_time: nullableInt,
+  elapsed_time: nullableInt,
+  icu_recording_time: nullableInt,
+  coasting_time: nullableInt,
+  icu_warmup_time: nullableInt,
+  icu_cooldown_time: nullableInt,
+
+  // Distance & speed
+  distance: nullableNumber,
+  average_speed: nullableNumber,
+  max_speed: nullableNumber,
+  pace: nullableNumber,
+  gap: nullableNumber,
+  threshold_pace: nullableNumber,
+
+  // Elevation
+  total_elevation_gain: nullableNumber,
+  total_elevation_loss: nullableNumber,
+  average_altitude: nullableNumber,
+  min_altitude: nullableNumber,
+  max_altitude: nullableNumber,
+
+  // Heart rate
+  average_heartrate: nullableInt,
+  max_heartrate: nullableInt,
+  lthr: nullableInt,
+  icu_resting_hr: nullableInt,
+
+  // Power
+  icu_average_watts: nullableInt,
+  icu_weighted_avg_watts: nullableInt,
+  icu_ftp: nullableInt,
+  device_watts: nullableBoolean,
+  icu_joules: nullableInt,
+  icu_joules_above_ftp: nullableInt,
+  icu_max_wbal_depletion: nullableInt,
+  p_max: nullableNumber,
+  icu_w_prime: nullableNumber,
+
+  // Cadence & stride
+  average_cadence: nullableNumber,
+  average_stride: nullableNumber,
+  icu_cadence_z2: nullableNumber,
+
+  // Training load & fitness
+  icu_training_load: nullableNumber,
+  icu_atl: nullableNumber,
+  icu_ctl: nullableNumber,
+  icu_intensity: nullableNumber,
+  trimp: nullableNumber,
+  calories: nullableNumber,
+  power_load: nullableNumber,
+  hr_load: nullableNumber,
+  pace_load: nullableNumber,
+  hr_load_type: nullableString,
+  pace_load_type: nullableString,
+  strain_score: nullableNumber,
+  session_rpe: nullableNumber,
+
+  // Performance metrics
+  decoupling: nullableNumber,
+  icu_efficiency_factor: nullableNumber,
+  icu_variability_index: nullableNumber,
+  icu_power_hr: nullableNumber,
+  icu_power_hr_z2: nullableNumber,
+  icu_power_hr_z2_mins: nullableNumber,
+  compliance: nullableNumber,
+  polarization_index: nullableNumber,
+
+  // Zone times
+  icu_zone_times: z.array(z.record(z.unknown())).nullable().optional(),
+  icu_hr_zone_times: nullableNumberArray,
+  pace_zone_times: nullableNumberArray,
+  gap_zone_times: nullableNumberArray,
+  use_gap_zone_times: nullableBoolean,
+
+  // Zone boundaries (athlete config at time of activity)
+  icu_hr_zones: nullableNumberArray,
+  icu_power_zones: nullableNumberArray,
+  pace_zones: nullableNumberArray,
+  icu_sweet_spot_min: nullableNumber,
+  icu_sweet_spot_max: nullableNumber,
+
+  // RPE & feel
+  icu_rpe: nullableInt,
+  feel: nullableInt,
+
+  // Context flags
+  commute: nullableBoolean,
+  race: nullableBoolean,
+  trainer: nullableBoolean,
+
+  // Equipment & device
+  device_name: nullableString,
+  gear: z.record(z.unknown()).nullable().optional(),
+
+  // Linked data
+  paired_event_id: nullableInt,
+  icu_lap_count: nullableInt,
+  interval_summary: z.array(z.string()).nullable().optional(),
+  icu_achievements: z.array(z.unknown()).nullable().optional(),
+  icu_hrr: z.record(z.unknown()).nullable().optional(),
+
+  // Temperature (device sensor)
+  average_temp: nullableNumber,
+  min_temp: nullableNumber,
+  max_temp: nullableNumber,
+
+  // Weather
+  average_weather_temp: nullableNumber,
+  min_weather_temp: nullableNumber,
+  max_weather_temp: nullableNumber,
+  average_feels_like: nullableNumber,
+  min_feels_like: nullableNumber,
+  max_feels_like: nullableNumber,
+  average_wind_speed: nullableNumber,
+  average_wind_gust: nullableNumber,
+  prevailing_wind_deg: nullableNumber,
+  headwind_percent: nullableNumber,
+  tailwind_percent: nullableNumber,
+  average_clouds: nullableNumber,
+  max_rain: nullableNumber,
+  max_snow: nullableNumber,
+
+  // Athlete context at time of activity
+  icu_weight: nullableNumber,
+
+  // Niche sport fields
+  carbs_used: nullableNumber,
+  carbs_ingested: nullableNumber,
+  kg_lifted: nullableNumber,
+  lengths: nullableInt,
+  pool_length: nullableNumber,
+
+  // Tags & attachments
+  tags: z.array(z.string()).nullable().optional(),
+  attachments: z.array(z.unknown()).nullable().optional(),
+});
+
+// Summary schema for list_activities (token-efficient: 18 fields vs 173 from API)
+export const ActivitySummarySchema = z.object({
+  id: z.string(),
+  start_date_local: z.string(),
+  name: nullableString,
+  type: nullableString,
+  distance: nullableNumber,
+  moving_time: nullableInt,
+  elapsed_time: nullableInt,
+  total_elevation_gain: nullableNumber,
+  average_heartrate: nullableInt,
+  max_heartrate: nullableInt,
+  average_speed: nullableNumber,
+  icu_training_load: nullableNumber,
+  icu_atl: nullableNumber,
+  icu_ctl: nullableNumber,
+  calories: nullableNumber,
+  commute: nullableBoolean,
+  paired_event_id: nullableInt,
+  source: nullableString,
+});
 
 // --- Wellness ---
 export const WellnessSchema = z
