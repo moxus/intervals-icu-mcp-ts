@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { removeNulls } from '../src/utils';
+import { removeNulls } from '../src/utils.js';
 
 describe('removeNulls', () => {
   it('should remove null properties from an object', () => {

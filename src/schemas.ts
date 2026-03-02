@@ -150,7 +150,6 @@ export const CreateEventSchema = z.object({
 });
 
 export const UpdateEventSchema = z.object({
-  id: z.number().int(), // Required for update
   start_date_local: z
     .string()
     .regex(
