@@ -10,7 +10,7 @@ import {
   CreateWorkoutSchema,
 } from './schemas.js';
 
-export async function startServer(athleteId: string, apiKey: string) {
+export function createMcpServer(athleteId: string, apiKey: string): McpServer {
   const server = new McpServer({
     name: 'intervals-mcp',
     version: '1.0.0',
@@ -250,7 +250,11 @@ export async function startServer(athleteId: string, apiKey: string) {
     },
   );
 
-  // Connect to transport
+  return server;
+}
+
+export async function startServer(athleteId: string, apiKey: string) {
+  const server = createMcpServer(athleteId, apiKey);
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }

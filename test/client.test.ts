@@ -1,11 +1,17 @@
 import { describe, it, expect, vi, beforeEach } from 'vitest';
 import { IntervalsClient } from '../src/api.js';
-import axios from 'axios';
 import { ActivitySchema, ActivitySummarySchema, EventSchema } from '../src/schemas.js';
 
-// Mock axios
-vi.mock('axios');
-const mockedAxios = axios as any;
+// Mock fetch
+const mockFetch = vi.fn();
+vi.stubGlobal('fetch', mockFetch);
+
+function jsonResponse(data: any, status = 200) {
+  return new Response(JSON.stringify(data), {
+    status,
+    headers: { 'Content-Type': 'application/json' },
+  });
+}
 
 describe('IntervalsClient', () => {
   let client: IntervalsClient;
@@ -14,14 +20,6 @@ describe('IntervalsClient', () => {
 
   beforeEach(() => {
     vi.clearAllMocks();
-    mockedAxios.create.mockReturnThis();
-    // Default mocked implementation for create instance methods
-    mockedAxios.get = vi.fn();
-    mockedAxios.post = vi.fn();
-    mockedAxios.put = vi.fn();
-    mockedAxios.delete = vi.fn();
-    mockedAxios.isAxiosError = (payload: any) => !!payload.isAxiosError;
-
     client = new IntervalsClient(mockAthleteId, mockApiKey);
   });
 
@@ -43,7 +41,7 @@ describe('IntervalsClient', () => {
       await expect(client.createEvent(pastEvent)).rejects.toThrow(
         'Cannot create events in the past',
       );
-      expect(mockedAxios.post).not.toHaveBeenCalled();
+      expect(mockFetch).not.toHaveBeenCalled();
     });
 
     it('should allow creating an event in the future', async () => {
@@ -52,11 +50,11 @@ describe('IntervalsClient', () => {
         name: 'Future Workout',
       };
       const mockResponse = { id: 123, ...futureEvent };
-      mockedAxios.post.mockResolvedValue({ data: mockResponse });
+      mockFetch.mockResolvedValue(jsonResponse(mockResponse));
 
       const result = await client.createEvent(futureEvent);
       expect(result).toBeDefined();
-      expect(mockedAxios.post).toHaveBeenCalled();
+      expect(mockFetch).toHaveBeenCalled();
     });
 
     it('should throw error when updating a past event', async () => {
@@ -66,12 +64,13 @@ describe('IntervalsClient', () => {
         start_date_local: pastDateStr,
         name: 'Old Workout',
       };
-      mockedAxios.get.mockResolvedValue({ data: existingPastEvent });
+      mockFetch.mockResolvedValue(jsonResponse(existingPastEvent));
 
       await expect(client.updateEvent(1, { name: 'New Name' })).rejects.toThrow(
         'Cannot modify past events',
       );
-      expect(mockedAxios.put).not.toHaveBeenCalled();
+      // Only the GET to fetch the existing event should have been called
+      expect(mockFetch).toHaveBeenCalledTimes(1);
     });
 
     it('should allow updating a future event', async () => {
@@ -81,12 +80,13 @@ describe('IntervalsClient', () => {
         start_date_local: futureDateStr,
         name: 'Future Workout',
       };
-      mockedAxios.get.mockResolvedValue({ data: existingFutureEvent });
-      mockedAxios.put.mockResolvedValue({ data: { ...existingFutureEvent, name: 'Updated Name' } });
+      mockFetch
+        .mockResolvedValueOnce(jsonResponse(existingFutureEvent)) // GET
+        .mockResolvedValueOnce(jsonResponse({ ...existingFutureEvent, name: 'Updated Name' })); // PUT
 
       const result = await client.updateEvent(2, { name: 'Updated Name' });
       expect(result.name).toBe('Updated Name');
-      expect(mockedAxios.put).toHaveBeenCalled();
+      expect(mockFetch).toHaveBeenCalledTimes(2);
     });
 
     it('should throw error when deleting a past event', async () => {
@@ -95,10 +95,11 @@ describe('IntervalsClient', () => {
         start_date_local: pastDateStr,
         name: 'Old Workout',
       };
-      mockedAxios.get.mockResolvedValue({ data: existingPastEvent });
+      mockFetch.mockResolvedValue(jsonResponse(existingPastEvent));
 
       await expect(client.deleteEvent(1)).rejects.toThrow('Cannot delete past events');
-      expect(mockedAxios.delete).not.toHaveBeenCalled();
+      // Only the GET to fetch the existing event should have been called
+      expect(mockFetch).toHaveBeenCalledTimes(1);
     });
   });
 
@@ -110,7 +111,7 @@ describe('IntervalsClient', () => {
         type: 'Ride',
         moving_time: 3600,
       };
-      mockedAxios.get.mockResolvedValue({ data: validActivity });
+      mockFetch.mockResolvedValue(jsonResponse(validActivity));
 
       const result = await client.getActivity('act1');
       expect(result).toEqual(validActivity);
@@ -122,7 +123,7 @@ describe('IntervalsClient', () => {
         // Missing start_date_local and type
         moving_time: 'not a number',
       };
-      mockedAxios.get.mockResolvedValue({ data: invalidActivity });
+      mockFetch.mockResolvedValue(jsonResponse(invalidActivity));
 
       // The client.getActivity calls ActivitySchema.parse, which should throw ZodError
       await expect(client.getActivity('act2')).rejects.toThrow();
@@ -220,7 +221,7 @@ describe('IntervalsClient', () => {
           icu_zone_times: [],
         },
       ];
-      mockedAxios.get.mockResolvedValue({ data: activitiesWithExtras });
+      mockFetch.mockResolvedValue(jsonResponse(activitiesWithExtras));
 
       const result = await client.getActivitiesSummary('2023-01-01', '2023-01-31');
       expect(result).toHaveLength(1);
