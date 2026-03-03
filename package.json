@@ -19,6 +19,7 @@
     "url": "https://github.com/moxus/intervals-icu-mcp-ts"
   },
   "license": "MIT",
+  "packageManager": "pnpm@10.9.0",
   "type": "module",
   "main": "./dist/index.js",
   "bin": {
@@ -46,6 +47,12 @@
     "commander": "^14.0.2",
     "dotenv": "^17.2.3",
     "zod": "^3.23.8"
+  },
+  "pnpm": {
+    "onlyBuiltDependencies": [
+      "esbuild",
+      "workerd"
+    ]
   },
   "devDependencies": {
     "@cloudflare/workers-types": "^4.20250312.0",

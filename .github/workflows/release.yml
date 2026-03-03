@@ -18,33 +18,33 @@ jobs:
         with:
           fetch-depth: 0
 
+      - name: Install pnpm
+        uses: pnpm/action-setup@v4
+
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
           node-version: '24'
           registry-url: 'https://registry.npmjs.org'
+          cache: 'pnpm'
 
       - name: Install dependencies
-        run: npm install
+        run: pnpm install --frozen-lockfile
 
       - name: Configure Git User
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-      - name: clean git
-        run: |
-          git checkout package-lock.json
-
       - name: Bump Version
         run: |
           npm version patch -m "chore(release): %s [skip ci]"
 
       - name: Build
-        run: npm run build
+        run: pnpm run build
 
       - name: Publish to NPM
-        run: npm publish --provenance --access public
+        run: pnpm publish --provenance --access public --no-git-checks
 
       - name: Push Changes
         run: git push --follow-tags
